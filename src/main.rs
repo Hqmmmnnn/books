@@ -15,6 +15,7 @@ extern crate actix_web;
 extern crate futures;
 
 use actix_web::{web, App, HttpServer};
+use db_connection::establish_connection;
 
 fn main() {
     let sys = actix::System::new("books_api");
@@ -22,13 +23,19 @@ fn main() {
 
     HttpServer::new(|| {
         App::new()
+            .data(establish_connection())
             .service(web::resource("/").route(web::get().to(handlers::default::index)))
             .service(
                 web::resource("/books")
                     .route(web::get().to(handlers::books::index))
-                    .route(web::get().to(handlers::books::create)),
+                    .route(web::post().to(handlers::books::create)),
             )
-            .service(web::resource("/books/{id}").route(web::get().to(handlers::books::find_by_id)))
+            .service(
+                web::resource("/books/{id}")
+                    .route(web::get().to(handlers::books::find_by_id))
+                    .route(web::delete().to(handlers::books::delete_by_id))
+                    .route(web::patch().to(handlers::books::update_by_id)),
+            )
     })
     .bind(uri)
     .unwrap()
