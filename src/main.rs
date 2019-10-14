@@ -1,4 +1,5 @@
 pub mod db_connection;
+pub mod errors;
 pub mod handlers;
 pub mod models;
 pub mod schema;
@@ -25,6 +26,7 @@ fn main() {
         App::new()
             .data(establish_connection())
             .service(web::resource("/").route(web::get().to(handlers::default::index)))
+            .service(web::resource("/register").route(web::post().to(handlers::register::register)))
             .service(
                 web::resource("/books")
                     .route(web::get().to(handlers::books::index))
