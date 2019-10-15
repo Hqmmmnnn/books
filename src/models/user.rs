@@ -74,3 +74,41 @@ impl RegisterUser {
     }
   }
 }
+
+#[derive(Deserialize)]
+pub struct AuthUser {
+  pub email: String,
+  pub first_name: String,
+  pub last_name: String,
+  pub password: String,
+}
+
+impl AuthUser {
+  pub fn login(&self, connection: &PgConnection) -> Result<User, MyStoreError> {
+    use crate::schema::users::dsl::email;
+    use bcrypt::verify;
+    use diesel::ExpressionMethods;
+    use diesel::QueryDsl;
+    use diesel::RunQueryDsl;
+
+    let mut records = users::table
+      .filter(email.eq(&self.email))
+      .load::<User>(connection)?;
+
+    let user = records
+      .pop()
+      .ok_or(MyStoreError::DBError(diesel::result::Error::NotFound))?;
+
+    let verify_password = verify(&self.password, &user.password).map_err(|_error| {
+      MyStoreError::WrongPassword("Wrong password, check again please".to_string())
+    })?;
+
+    if verify_password {
+      Ok(user)
+    } else {
+      Err(MyStoreError::WrongPassword(
+        "Wrong password, check again please".to_string(),
+      ))
+    }
+  }
+}
