@@ -1,6 +1,7 @@
 pub mod authentication;
 pub mod books;
 pub mod default;
+pub mod get_current_account;
 pub mod register;
 
 use crate::db_connection::{PgPool, PgPooledConnection};
@@ -27,21 +28,25 @@ impl FromRequest for LoggedUser {
   type Future = Result<Self, HttpResponse>;
 
   fn from_request(req: &HttpRequest, payload: &mut dev::Payload) -> Self::Future {
-    let generator = req
-      .app_data::<CsrfTokenGenerator>()
-      .ok_or(HttpResponse::InternalServerError())?;
+    let generator = req.app_data::<CsrfTokenGenerator>().ok_or({
+      println!("req.app_data failure");
+      HttpResponse::InternalServerError()
+    })?;
 
-    let csrf_token = req
-      .headers()
-      .get("x-csrf-token")
-      .ok_or(HttpResponse::Unauthorized())?;
+    let csrf_token = req.headers().get("x-csrf-token").ok_or({
+      println!("get x-src-token failure");
+      HttpResponse::Unauthorized()
+    })?;
 
-    let decoded_token = hex::decode(&csrf_token)
-      .map_err(|error| HttpResponse::InternalServerError().json(error.to_string()))?;
+    let decoded_token = hex::decode(&csrf_token).map_err(|error| {
+      println!("decoded_token failure");
+      HttpResponse::InternalServerError().json(error.to_string())
+    })?;
 
-    generator
-      .verify(&decoded_token)
-      .map_err(|_| HttpResponse::Unauthorized())?;
+    generator.verify(&decoded_token).map_err(|_| {
+      println!("verify decoded_token failure");
+      HttpResponse::Unauthorized()
+    })?;
 
     // We're using the CookieIdentityPolicy middleware
     // to handle cookies, with this implementation this
@@ -51,6 +56,9 @@ impl FromRequest for LoggedUser {
       let user: SlimUser = decode_token(&identity)?;
       return Ok(user as LoggedUser);
     }
-    Err(HttpResponse::Unauthorized().into())
+    Err({
+      println!("some(itentity) failure");
+      HttpResponse::Unauthorized().into()
+    })
   }
 }

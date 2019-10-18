@@ -55,7 +55,6 @@ fn main() {
             ))
             .wrap(
                 Cors::new()
-                    .allowed_origin(dotenv!("ALLOWED_ORIGIN"))
                     .allowed_methods(vec!["GET", "POST", "PUT", "DELETE"])
                     .allowed_headers(vec![
                         header::AUTHORIZATION,
@@ -68,9 +67,13 @@ fn main() {
             )
             .data(CsrfTokenGenerator::new(
                 dotenv!("CSRF_TOKEN_KEY").as_bytes().to_vec(),
-                Duration::hours(1),
+                Duration::hours(2),
             ))
             .data(establish_connection())
+            .service(
+                web::resource("/getCurrentAccount")
+                    .route(web::get().to(handlers::get_current_account::get_current_account)),
+            )
             .service(web::resource("/").route(web::get().to(handlers::default::index)))
             .service(web::resource("/register").route(web::post().to(handlers::register::register)))
             .service(

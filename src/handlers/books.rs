@@ -1,14 +1,11 @@
-use crate::db_connection::{PgPool, PgPooledConnection};
+use crate::db_connection::PgPool;
+use crate::handlers::pg_pool_handler;
+use crate::handlers::LoggedUser;
 use crate::models::book::{Book, ListOfBooks, NewBook};
-use actix_web::{web, HttpRequest, HttpResponse};
 
-fn pg_pool_handler(pool: web::Data<PgPool>) -> Result<PgPooledConnection, HttpResponse> {
-  pool
-    .get()
-    .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
-}
+use actix_web::{web, HttpResponse, Result};
 
-pub fn index(_req: HttpRequest, pool: web::Data<PgPool>) -> Result<HttpResponse, HttpResponse> {
+pub fn index(_user: LoggedUser, pool: web::Data<PgPool>) -> Result<HttpResponse, HttpResponse> {
   let pg_pool = pg_pool_handler(pool)?;
   Ok(HttpResponse::Ok().json(ListOfBooks::get_list(&pg_pool)))
 }
@@ -25,6 +22,7 @@ pub fn create(
 }
 
 pub fn find_by_id(
+  _user: LoggedUser,
   id: web::Path<i32>,
   pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, HttpResponse> {

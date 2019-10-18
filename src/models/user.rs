@@ -78,8 +78,6 @@ impl RegisterUser {
 #[derive(Deserialize)]
 pub struct AuthUser {
   pub email: String,
-  pub first_name: String,
-  pub last_name: String,
   pub password: String,
 }
 

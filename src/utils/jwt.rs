@@ -12,6 +12,7 @@ struct Claims {
 
 // We're using a struct so we can implement a conversion from
 // Claims to SlimUser, useful in the decode function.
+#[derive(Serialize)]
 pub struct SlimUser {
   pub email: String,
   pub first_name: String,
@@ -45,14 +46,19 @@ pub fn create_token(
   last_name: &str,
 ) -> Result<String, HttpResponse> {
   let claims = Claims::with_email(email, first_name, last_name);
-  encode(&Header::default(), &claims, get_secret())
-    .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
+  encode(&Header::default(), &claims, get_secret()).map_err(|e| {
+    println!("create_token failure");
+    HttpResponse::InternalServerError().json(e.to_string())
+  })
 }
 
 pub fn decode_token(token: &str) -> Result<SlimUser, HttpResponse> {
   decode::<Claims>(token, get_secret(), &Validation::default())
     .map(|data| data.claims.into())
-    .map_err(|e| HttpResponse::Unauthorized().json(e.to_string()))
+    .map_err(|e| {
+      println!("decode_token failure");
+      HttpResponse::Unauthorized().json(e.to_string())
+    })
 }
 
 fn get_secret<'a>() -> &'a [u8] {

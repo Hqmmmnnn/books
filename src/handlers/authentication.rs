@@ -10,9 +10,6 @@ use crate::errors::MyStoreError;
 use crate::handlers::pg_pool_handler;
 use crate::models::user::AuthUser;
 
-// We get a new connection pool, then look up for the user,
-// If there is no user a NotFound error would raise otherwise
-// this would just through an InternalServerError.
 pub fn login(
   auth_user: web::Json<AuthUser>,
   id: Identity,
@@ -22,6 +19,7 @@ pub fn login(
   let pg_pool = pg_pool_handler(pool)?;
   let user = auth_user.login(&pg_pool).map_err(|e| match e {
     MyStoreError::DBError(diesel::result::Error::NotFound) => {
+      println!("auth_user_login failure");
       HttpResponse::NotFound().json(e.to_string())
     }
     _ => HttpResponse::InternalServerError().json(e.to_string()),
