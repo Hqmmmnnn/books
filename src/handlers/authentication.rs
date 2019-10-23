@@ -26,7 +26,7 @@ pub fn login(
   })?;
 
   // This is the jwt token we will send in a cookie.
-  let token = create_token(&user.email, &user.first_name, &user.last_name)?;
+  let token = create_token(user.id, &user.email, &user.first_name, &user.last_name)?;
 
   id.remember(token);
 
