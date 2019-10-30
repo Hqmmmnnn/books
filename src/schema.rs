@@ -1,7 +1,4 @@
 table! {
-    use diesel::sql_types::Int4;
-    use diesel::sql_types::Varchar;
-    use diesel::sql_types::Nullable;
     books (id) {
         id -> Int4,
         user_id -> Int4,
@@ -17,6 +14,7 @@ table! {
         email -> Varchar,
         first_name -> Varchar,
         last_name -> Varchar,
+        role -> Varchar,
         password -> Varchar,
         created_at -> Timestamp,
     }
@@ -24,4 +22,7 @@ table! {
 
 joinable!(books -> users (user_id));
 
-allow_tables_to_appear_in_same_query!(books, users,);
+allow_tables_to_appear_in_same_query!(
+    books,
+    users,
+);

@@ -8,6 +8,7 @@ struct Claims {
   email: String,
   first_name: String,
   last_name: String,
+  role: String,
   exp: usize,
 }
 
@@ -19,6 +20,7 @@ pub struct SlimUser {
   pub email: String,
   pub first_name: String,
   pub last_name: String,
+  pub role: String,
 }
 
 impl From<Claims> for SlimUser {
@@ -28,17 +30,19 @@ impl From<Claims> for SlimUser {
       email: claims.email,
       first_name: claims.first_name,
       last_name: claims.last_name,
+      role: claims.role,
     }
   }
 }
 
 impl Claims {
-  fn with_email(id: i32, email: &str, first_name: &str, last_name: &str) -> Self {
+  fn with_email(id: i32, email: &str, first_name: &str, last_name: &str, role: &str) -> Self {
     Claims {
       sub: id,
       email: email.into(),
       first_name: first_name.into(),
       last_name: last_name.into(),
+      role: role.into(),
       exp: (Local::now() + Duration::hours(24)).timestamp() as usize,
     }
   }
@@ -49,8 +53,9 @@ pub fn create_token(
   email: &str,
   first_name: &str,
   last_name: &str,
+  role: &str,
 ) -> Result<String, HttpResponse> {
-  let claims = Claims::with_email(id, email, first_name, last_name);
+  let claims = Claims::with_email(id, email, first_name, last_name, role);
   encode(&Header::default(), &claims, get_secret()).map_err(|e| {
     println!("create_token failure");
     HttpResponse::InternalServerError().json(e.to_string())

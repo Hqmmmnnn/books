@@ -19,18 +19,21 @@ pub fn login(
   let pg_pool = pg_pool_handler(pool)?;
   let user = auth_user.login(&pg_pool).map_err(|e| match e {
     MyStoreError::DBError(diesel::result::Error::NotFound) => {
-      println!("auth_user_login failure");
       HttpResponse::NotFound().json(e.to_string())
     }
     _ => HttpResponse::InternalServerError().json(e.to_string()),
   })?;
 
-  // This is the jwt token we will send in a cookie.
-  let token = create_token(user.id, &user.email, &user.first_name, &user.last_name)?;
+  let token = create_token(
+    user.id,
+    &user.email,
+    &user.first_name,
+    &user.last_name,
+    "admin",
+  )?;
 
   id.remember(token);
 
-  // Finally our response will have a csrf token for security.
   let response = HttpResponse::Ok()
     .header("X-CSRF-TOKEN", hex::encode(generator.generate()))
     .json(user);

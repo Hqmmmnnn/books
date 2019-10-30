@@ -5,6 +5,11 @@ use crate::models::book::{Book, ListOfBooks, NewBook};
 
 use actix_web::{web, HttpResponse, Result};
 
+pub fn get_all_books(pool: web::Data<PgPool>) -> Result<HttpResponse, HttpResponse> {
+  let pg_pool = pg_pool_handler(pool)?;
+  Ok(HttpResponse::Ok().json(ListOfBooks::get_list(1, &pg_pool)))
+}
+
 pub fn index(_user: LoggedUser, pool: web::Data<PgPool>) -> Result<HttpResponse, HttpResponse> {
   let pg_pool = pg_pool_handler(pool)?;
   Ok(HttpResponse::Ok().json(ListOfBooks::get_list(_user.id, &pg_pool)))

@@ -1,6 +1,12 @@
 use crate::schema::books;
 use diesel::PgConnection;
 
+use crate::schema;
+use crate::schema::books::dsl::*;
+use diesel::ExpressionMethods;
+use diesel::QueryDsl;
+use diesel::RunQueryDsl;
+
 #[derive(Identifiable, Queryable, Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[table_name = "books"]
 pub struct Book {
@@ -17,12 +23,6 @@ impl Book {
     _id: &i32,
     connection: &PgConnection,
   ) -> Result<Book, diesel::result::Error> {
-    use crate::schema;
-    use crate::schema::books::dsl::*;
-    use diesel::ExpressionMethods;
-    use diesel::QueryDsl;
-    use diesel::RunQueryDsl;
-
     let product: Book = schema::books::table
       .filter(user_id.eq(param_user_id))
       .find(_id)
@@ -36,12 +36,6 @@ impl Book {
     _id: &i32,
     connection: &PgConnection,
   ) -> Result<(), diesel::result::Error> {
-    use crate::schema;
-    use crate::schema::books::dsl::*;
-    use diesel::ExpressionMethods;
-    use diesel::QueryDsl;
-    use diesel::RunQueryDsl;
-
     diesel::delete(
       schema::books::table
         .filter(user_id.eq(param_user_id))
@@ -57,12 +51,6 @@ impl Book {
     connection: &PgConnection,
     new_book: &NewBook,
   ) -> Result<(), diesel::result::Error> {
-    use crate::schema;
-    use crate::schema::books::dsl::*;
-    use diesel::ExpressionMethods;
-    use diesel::QueryDsl;
-    use diesel::RunQueryDsl;
-
     diesel::update(
       schema::books::table
         .filter(user_id.eq(param_user_id))
@@ -89,8 +77,6 @@ impl NewBook {
     param_user_id: i32,
     connection: &PgConnection,
   ) -> Result<Book, diesel::result::Error> {
-    use diesel::RunQueryDsl;
-
     let new_book = NewBook {
       user_id: Some(param_user_id),
       ..self.clone()
@@ -107,11 +93,6 @@ pub struct ListOfBooks(pub Vec<Book>);
 
 impl ListOfBooks {
   pub fn get_list(param_user_id: i32, connection: &PgConnection) -> Self {
-    use crate::schema::books::dsl::*;
-    use diesel::ExpressionMethods;
-    use diesel::QueryDsl;
-    use diesel::RunQueryDsl;
-
     let result = books
       .filter(user_id.eq(param_user_id))
       .limit(10)

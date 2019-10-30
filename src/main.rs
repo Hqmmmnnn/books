@@ -83,6 +83,9 @@ fn main() {
                     .route(web::post().to(handlers::books::create)),
             )
             .service(
+                web::resource("/allBooks").route(web::get().to(handlers::books::get_all_books)),
+            )
+            .service(
                 web::resource("/books/{id}")
                     .route(web::get().to(handlers::books::find_by_id))
                     .route(web::delete().to(handlers::books::delete_by_id))

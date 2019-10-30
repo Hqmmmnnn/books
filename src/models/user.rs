@@ -9,6 +9,7 @@ pub struct User {
   pub email: String,
   pub first_name: String,
   pub last_name: String,
+  pub role: String,
   #[serde(skip)]
   pub password: String,
   pub created_at: NaiveDateTime,
@@ -20,6 +21,7 @@ pub struct NewUser {
   pub email: String,
   pub first_name: String,
   pub last_name: String,
+  pub role: String,
   pub password: String,
   pub created_at: NaiveDateTime,
 }
@@ -42,6 +44,7 @@ impl User {
           email: register_user.email,
           first_name: register_user.first_name,
           last_name: register_user.last_name,
+          role: String::from("admin"),
           password: Self::hash_password(register_user.password)?,
           created_at: Local::now().naive_local(),
         })
