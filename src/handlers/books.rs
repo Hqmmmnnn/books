@@ -32,12 +32,13 @@ pub fn create(
 
 pub fn find_by_id(
   _user: LoggedUser,
-  id: web::Path<i32>,
+  _book_id: web::Path<i32>,
+
   pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, HttpResponse> {
   let pg_pool = pg_pool_handler(pool)?;
-  Book::find_by_id(_user.id, &id, &pg_pool)
-    .map(|book| HttpResponse::Ok().json(book))
+  Book::find_by_id(_user.id, &_book_id, &pg_pool)
+    .map(|book_with_author| HttpResponse::Ok().json(book_with_author))
     .map_err(|err| HttpResponse::InternalServerError().json(err.to_string()))
 }
 

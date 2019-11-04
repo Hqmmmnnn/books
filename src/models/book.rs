@@ -27,19 +27,20 @@ pub struct BookWithAuthorName {
 
 impl Book {
   pub fn find_by_id(
-    param_user_id: i32,
-    _id: &i32,
+    _param_user_id: i32,
+    _book_id: &i32,
     connection: &PgConnection,
   ) -> Result<BookWithAuthorName, diesel::result::Error> {
-    use crate::schema::authors::dsl::*;
+    use crate::schema::authors::dsl::{fio, id as author_ident};
+    use crate::schema::books::dsl::*;
 
     let book: Book = schema::books::table
-      .filter(user_id.eq(param_user_id))
-      .find(_id)
+      .filter(user_id.eq(_param_user_id))
+      .find(_book_id)
       .first(connection)?;
 
     let author_name = schema::authors::table
-      .filter(id.eq(_id))
+      .filter(author_ident.eq(book.author_id))
       .select(fio)
       .first::<String>(connection)?;
 
