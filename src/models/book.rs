@@ -1,20 +1,28 @@
+use crate::models::author::Author;
+use crate::schema;
 use crate::schema::books;
 use diesel::PgConnection;
 
-use crate::schema;
 use crate::schema::books::dsl::*;
 use diesel::ExpressionMethods;
 use diesel::QueryDsl;
 use diesel::RunQueryDsl;
 
-#[derive(Identifiable, Queryable, Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Identifiable, Associations, Queryable, Serialize, Deserialize, Clone, PartialEq)]
+#[belongs_to(Author)]
 #[table_name = "books"]
 pub struct Book {
   pub id: i32,
   pub user_id: i32,
+  pub author_id: i32,
   pub name: String,
-  pub author: String,
   pub price: Option<i32>,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct BookWithAuthorName {
+  pub book: Book,
+  pub author_name: String,
 }
 
 impl Book {
@@ -22,13 +30,22 @@ impl Book {
     param_user_id: i32,
     _id: &i32,
     connection: &PgConnection,
-  ) -> Result<Book, diesel::result::Error> {
-    let product: Book = schema::books::table
+  ) -> Result<BookWithAuthorName, diesel::result::Error> {
+    use crate::schema::authors::dsl::*;
+
+    let book: Book = schema::books::table
       .filter(user_id.eq(param_user_id))
       .find(_id)
       .first(connection)?;
 
-    Ok(product)
+    let author_name = schema::authors::table
+      .filter(id.eq(_id))
+      .select(fio)
+      .first::<String>(connection)?;
+
+    let book_with_author_name = BookWithAuthorName { book, author_name };
+
+    Ok(book_with_author_name)
   }
 
   pub fn delete_by_id(
@@ -67,7 +84,7 @@ impl Book {
 pub struct NewBook {
   pub user_id: Option<i32>,
   pub name: Option<String>,
-  pub author: Option<String>,
+  pub author_id: Option<i32>,
   pub price: Option<i32>,
 }
 

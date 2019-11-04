@@ -1,4 +1,5 @@
 pub mod authentication;
+pub mod authors;
 pub mod books;
 pub mod default;
 pub mod get_current_account;
@@ -48,10 +49,6 @@ impl FromRequest for LoggedUser {
       HttpResponse::Unauthorized()
     })?;
 
-    // We're using the CookieIdentityPolicy middleware
-    // to handle cookies, with this implementation this
-    // will validate the cookie according to the secret
-    // provided in main function
     if let Some(identity) = Identity::from_request(req, payload)?.identity() {
       let user: SlimUser = decode_token(&identity)?;
       return Ok(user as LoggedUser);

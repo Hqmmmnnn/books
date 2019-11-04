@@ -78,12 +78,12 @@ fn main() {
                     .route(web::delete().to(handlers::authentication::logout)),
             )
             .service(
-                web::resource("/books")
-                    .route(web::get().to(handlers::books::index))
-                    .route(web::post().to(handlers::books::create)),
+                web::resource("/allBooks").route(web::get().to(handlers::books::get_all_books)),
             )
             .service(
-                web::resource("/allBooks").route(web::get().to(handlers::books::get_all_books)),
+                web::resource("/books")
+                    .route(web::get().to(handlers::books::get_books_by_id))
+                    .route(web::post().to(handlers::books::create)),
             )
             .service(
                 web::resource("/books/{id}")
@@ -91,6 +91,7 @@ fn main() {
                     .route(web::delete().to(handlers::books::delete_by_id))
                     .route(web::patch().to(handlers::books::update_by_id)),
             )
+            .service(web::resource("/author").route(web::post().to(handlers::authors::create)))
             .service(
                 web::resource("/getCurrentAccount")
                     .route(web::get().to(handlers::get_current_account::get_current_account)),

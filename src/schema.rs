@@ -1,9 +1,18 @@
 table! {
+    authors (id) {
+        id -> Int4,
+        fio -> Varchar,
+        date_of_birth -> Varchar,
+        country -> Varchar,
+    }
+}
+
+table! {
     books (id) {
         id -> Int4,
         user_id -> Int4,
+        author_id -> Int4,
         name -> Varchar,
-        author -> Varchar,
         price -> Nullable<Int4>,
     }
 }
@@ -21,8 +30,6 @@ table! {
 }
 
 joinable!(books -> users (user_id));
+joinable!(books -> authors(author_id));
 
-allow_tables_to_appear_in_same_query!(
-    books,
-    users,
-);
+allow_tables_to_appear_in_same_query!(authors, books, users,);
