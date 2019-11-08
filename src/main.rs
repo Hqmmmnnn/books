@@ -78,11 +78,13 @@ fn main() {
                     .route(web::delete().to(handlers::authentication::logout)),
             )
             .service(
-                web::resource("/allBooks").route(web::get().to(handlers::books::get_all_books)),
+                web::resource("/userBooks").route(web::get().to(handlers::books::get_users_books)),
             )
+            .service(web::resource("/proverka").route(web::get().to(handlers::books::proverka)))
+            .service(web::resource("/takeBook").route(web::post().to(handlers::books::take_book)))
             .service(
                 web::resource("/books")
-                    .route(web::get().to(handlers::books::get_books_by_id))
+                    .route(web::get().to(handlers::books::get_all_books))
                     .route(web::post().to(handlers::books::create)),
             )
             .service(

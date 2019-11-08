@@ -2,8 +2,8 @@
 CREATE TABLE books
 (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER NOT NULL REFERENCES users(id),
-  author_id INTEGER NOT NULL REFERENCES authors(id),
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  author_id INTEGER NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
   name VARCHAR NOT NULL,
   price INTEGER
 );

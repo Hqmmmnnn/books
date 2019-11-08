@@ -2,12 +2,26 @@ use crate::db_connection::PgPool;
 use crate::handlers::pg_pool_handler;
 use crate::handlers::LoggedUser;
 use crate::models::book::{Book, ListOfBooks, NewBook};
+use crate::models::user_book::{ListOfUserBook, NewUserBook};
 
 use actix_web::{web, HttpResponse, Result};
 
 pub fn get_all_books(pool: web::Data<PgPool>) -> Result<HttpResponse, HttpResponse> {
   let pg_pool = pg_pool_handler(pool)?;
   Ok(HttpResponse::Ok().json(ListOfBooks::get_list(1, &pg_pool)))
+}
+
+pub fn get_users_books(
+  pool: web::Data<PgPool>,
+  _user: LoggedUser,
+) -> Result<HttpResponse, HttpResponse> {
+  let pg_pool = pg_pool_handler(pool)?;
+  Ok(HttpResponse::Ok().json(ListOfUserBook::get_all_books(_user.id, &pg_pool)))
+}
+
+pub fn proverka(pool: web::Data<PgPool>, _user: LoggedUser) -> Result<HttpResponse, HttpResponse> {
+  let pg_pool = pg_pool_handler(pool)?;
+  Ok(HttpResponse::Ok().json(ListOfUserBook::proverka(_user.id, &pg_pool)))
 }
 
 pub fn get_books_by_id(
@@ -18,13 +32,25 @@ pub fn get_books_by_id(
   Ok(HttpResponse::Ok().json(ListOfBooks::get_list(_user.id, &pg_pool)))
 }
 
-pub fn create(
+pub fn take_book(
   _user: LoggedUser,
-  new_product: web::Json<NewBook>,
+  new_user_book: web::Json<NewUserBook>,
   pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, HttpResponse> {
   let pg_pool = pg_pool_handler(pool)?;
-  new_product
+  new_user_book
+    .take_book(_user.id, &pg_pool)
+    .map(|user_book| HttpResponse::Ok().json(user_book))
+    .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
+}
+
+pub fn create(
+  _user: LoggedUser,
+  new_book: web::Json<NewBook>,
+  pool: web::Data<PgPool>,
+) -> Result<HttpResponse, HttpResponse> {
+  let pg_pool = pg_pool_handler(pool)?;
+  new_book
     .create(_user.id, &pg_pool)
     .map(|book| HttpResponse::Ok().json(book))
     .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))

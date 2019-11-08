@@ -29,7 +29,23 @@ table! {
     }
 }
 
-joinable!(books -> users (user_id));
-joinable!(books -> authors(author_id));
+table! {
+    users_books (id) {
+        id -> Int4,
+        user_id -> Int4,
+        book_id -> Int4,
+        amount -> Int4,
+    }
+}
 
-allow_tables_to_appear_in_same_query!(authors, books, users,);
+joinable!(books -> authors (author_id));
+joinable!(books -> users (user_id));
+joinable!(users_books -> books (book_id));
+joinable!(users_books -> users (user_id));
+
+allow_tables_to_appear_in_same_query!(
+    authors,
+    books,
+    users,
+    users_books,
+);
