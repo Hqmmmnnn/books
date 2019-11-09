@@ -29,7 +29,7 @@ pub fn login(
     &user.email,
     &user.first_name,
     &user.last_name,
-    "admin",
+    &user.role,
   )?;
 
   id.remember(token);

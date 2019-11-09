@@ -51,13 +51,13 @@ impl Book {
 
   pub fn delete_by_id(
     param_user_id: i32,
-    _id: &i32,
+    book_id: &i32,
     connection: &PgConnection,
   ) -> Result<(), diesel::result::Error> {
     diesel::delete(
       schema::books::table
         .filter(user_id.eq(param_user_id))
-        .find(_id),
+        .find(book_id),
     )
     .execute(connection)?;
     Ok(())

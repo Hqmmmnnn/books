@@ -84,7 +84,7 @@ fn main() {
             .service(web::resource("/takeBook").route(web::post().to(handlers::books::take_book)))
             .service(
                 web::resource("/books")
-                    .route(web::get().to(handlers::books::get_all_books))
+                    .route(web::get().to(handlers::books::get_all))
                     .route(web::post().to(handlers::books::create)),
             )
             .service(
@@ -93,7 +93,15 @@ fn main() {
                     .route(web::delete().to(handlers::books::delete_by_id))
                     .route(web::patch().to(handlers::books::update_by_id)),
             )
-            .service(web::resource("/author").route(web::post().to(handlers::authors::create)))
+            .service(
+                web::resource("/authors")
+                    .route(web::get().to(handlers::authors::get_all))
+                    .route(web::post().to(handlers::authors::create)),
+            )
+            .service(
+                web::resource("/authors/{id}")
+                    .route(web::delete().to(handlers::authors::delete_by_id)),
+            )
             .service(
                 web::resource("/getCurrentAccount")
                     .route(web::get().to(handlers::get_current_account::get_current_account)),

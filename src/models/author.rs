@@ -15,12 +15,32 @@ pub struct Author {
 }
 
 impl Author {
-  pub fn get_author_by_id(author_id: &i32, connection: &PgConnection) -> Self {
+  pub fn get_by_id(author_id: &i32, connection: &PgConnection) -> Self {
     let result: Author = authors::table
       .find(author_id)
       .first(connection)
-      .expect("Error loading authors");
+      .expect("Error loading author");
     result
+  }
+
+  pub fn delete_by_id(
+    author_id: &i32,
+    connection: &PgConnection,
+  ) -> Result<(), diesel::result::Error> {
+    diesel::delete(authors::table.find(author_id)).execute(connection)?;
+    Ok(())
+  }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ListOfAuthors(pub Vec<Author>);
+
+impl ListOfAuthors {
+  pub fn get_all_authors(connection: &PgConnection) -> Self {
+    let authors = authors::table
+      .load::<Author>(connection)
+      .expect("Error loading authors");
+    ListOfAuthors(authors)
   }
 }
 

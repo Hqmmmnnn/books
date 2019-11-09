@@ -16,14 +16,6 @@ pub struct UserBook {
   pub amount: i32,
 }
 
-#[derive(Insertable, Deserialize, AsChangeset, Clone)]
-#[table_name = "users_books"]
-pub struct NewUserBook {
-  pub user_id: i32,
-  pub book_id: i32,
-  pub amount: i32,
-}
-
 #[derive(Serialize, Deserialize)]
 pub struct ListOfUserBook(pub Vec<UserBook>);
 
@@ -77,6 +69,14 @@ impl ListOfUserBook {
   }
 }
 
+#[derive(Insertable, Deserialize, AsChangeset, Clone)]
+#[table_name = "users_books"]
+pub struct NewUserBook {
+  pub user_id: Option<i32>,
+  pub book_id: i32,
+  pub amount: i32,
+}
+
 impl NewUserBook {
   pub fn take_book(
     &self,
@@ -84,9 +84,8 @@ impl NewUserBook {
     connection: &PgConnection,
   ) -> Result<UserBook, diesel::result::Error> {
     let new_user_book = NewUserBook {
-      user_id: param_user_id,
-      book_id: self.book_id,
-      amount: self.amount,
+      user_id: Some(param_user_id),
+      ..self.clone()
     };
 
     diesel::insert_into(users_books::table)

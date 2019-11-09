@@ -6,7 +6,7 @@ use crate::models::user_book::{ListOfUserBook, NewUserBook};
 
 use actix_web::{web, HttpResponse, Result};
 
-pub fn get_all_books(pool: web::Data<PgPool>) -> Result<HttpResponse, HttpResponse> {
+pub fn get_all(pool: web::Data<PgPool>) -> Result<HttpResponse, HttpResponse> {
   let pg_pool = pg_pool_handler(pool)?;
   Ok(HttpResponse::Ok().json(ListOfBooks::get_list(1, &pg_pool)))
 }
@@ -70,11 +70,11 @@ pub fn find_by_id(
 
 pub fn delete_by_id(
   _user: LoggedUser,
-  id: web::Path<i32>,
+  book_id: web::Path<i32>,
   pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, HttpResponse> {
   let pg_pool = pg_pool_handler(pool)?;
-  Book::delete_by_id(_user.id, &id, &pg_pool)
+  Book::delete_by_id(_user.id, &book_id, &pg_pool)
     .map(|_| HttpResponse::Ok().json(()))
     .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
 }
