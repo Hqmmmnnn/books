@@ -32,12 +32,8 @@ impl Book {
     connection: &PgConnection,
   ) -> Result<BookWithAuthorName, diesel::result::Error> {
     use crate::schema::authors::dsl::{fio, id as author_ident};
-    use crate::schema::books::dsl::*;
 
-    let book: Book = schema::books::table
-      .filter(user_id.eq(_param_user_id))
-      .find(_book_id)
-      .first(connection)?;
+    let book: Book = schema::books::table.find(_book_id).first(connection)?;
 
     let author_name = schema::authors::table
       .filter(author_ident.eq(book.author_id))

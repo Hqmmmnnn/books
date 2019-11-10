@@ -19,11 +19,6 @@ pub fn get_users_books(
   Ok(HttpResponse::Ok().json(ListOfUserBook::get_all_books(_user.id, &pg_pool)))
 }
 
-pub fn proverka(pool: web::Data<PgPool>, _user: LoggedUser) -> Result<HttpResponse, HttpResponse> {
-  let pg_pool = pg_pool_handler(pool)?;
-  Ok(HttpResponse::Ok().json(ListOfUserBook::proverka(_user.id, &pg_pool)))
-}
-
 pub fn get_books_by_id(
   _user: LoggedUser,
   pool: web::Data<PgPool>,
@@ -49,11 +44,15 @@ pub fn create(
   new_book: web::Json<NewBook>,
   pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, HttpResponse> {
-  let pg_pool = pg_pool_handler(pool)?;
-  new_book
-    .create(_user.id, &pg_pool)
-    .map(|book| HttpResponse::Ok().json(book))
-    .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
+  if _user.role == String::from("admin") {
+    let pg_pool = pg_pool_handler(pool)?;
+    new_book
+      .create(_user.id, &pg_pool)
+      .map(|book| HttpResponse::Ok().json(book))
+      .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
+  } else {
+    Err(HttpResponse::InternalServerError().json("access denied".to_string()))
+  }
 }
 
 pub fn find_by_id(
@@ -73,10 +72,14 @@ pub fn delete_by_id(
   book_id: web::Path<i32>,
   pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, HttpResponse> {
-  let pg_pool = pg_pool_handler(pool)?;
-  Book::delete_by_id(_user.id, &book_id, &pg_pool)
-    .map(|_| HttpResponse::Ok().json(()))
-    .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
+  if _user.role == String::from("admin") {
+    let pg_pool = pg_pool_handler(pool)?;
+    Book::delete_by_id(_user.id, &book_id, &pg_pool)
+      .map(|_| HttpResponse::Ok().json(()))
+      .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
+  } else {
+    Err(HttpResponse::InternalServerError().json("access denied".to_string()))
+  }
 }
 
 pub fn update_by_id(
@@ -85,8 +88,12 @@ pub fn update_by_id(
   pool: web::Data<PgPool>,
   new_product: web::Json<NewBook>,
 ) -> Result<HttpResponse, HttpResponse> {
-  let pg_pool = pg_pool_handler(pool)?;
-  Book::update_by_id(_user.id, &id, &pg_pool, &new_product)
-    .map(|_| HttpResponse::Ok().json(()))
-    .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
+  if _user.role == String::from("admin") {
+    let pg_pool = pg_pool_handler(pool)?;
+    Book::update_by_id(_user.id, &id, &pg_pool, &new_product)
+      .map(|_| HttpResponse::Ok().json(()))
+      .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
+  } else {
+    Err(HttpResponse::InternalServerError().json("access denied".to_string()))
+  }
 }

@@ -10,11 +10,15 @@ pub fn create(
   new_author: web::Json<NewAuthor>,
   pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, HttpResponse> {
-  let pg_pool = pg_pool_handler(pool)?;
-  new_author
-    .create(&pg_pool)
-    .map(|author| HttpResponse::Ok().json(author))
-    .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
+  if _user.role == String::from("admin") {
+    let pg_pool = pg_pool_handler(pool)?;
+    new_author
+      .create(&pg_pool)
+      .map(|author| HttpResponse::Ok().json(author))
+      .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
+  } else {
+    Err(HttpResponse::InternalServerError().json("access denied".to_string()))
+  }
 }
 
 pub fn get_by_id(
@@ -31,13 +35,17 @@ pub fn delete_by_id(
   author_id: web::Path<i32>,
   pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, HttpResponse> {
-  let pg_pool = pg_pool_handler(pool)?;
-  Author::delete_by_id(&author_id, &pg_pool)
-    .map(|_| HttpResponse::Ok().json(()))
-    .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
+  if _user.role == String::from("admin") {
+    let pg_pool = pg_pool_handler(pool)?;
+    Author::delete_by_id(&author_id, &pg_pool)
+      .map(|_| HttpResponse::Ok().json(()))
+      .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
+  } else {
+    Err(HttpResponse::InternalServerError().json("access denied".to_string()))
+  }
 }
 
-pub fn get_all(pool: web::Data<PgPool>) -> Result<HttpResponse, HttpResponse> {
+pub fn get_all(_user: LoggedUser, pool: web::Data<PgPool>) -> Result<HttpResponse, HttpResponse> {
   let pg_pool = pg_pool_handler(pool)?;
   Ok(HttpResponse::Ok().json(ListOfAuthors::get_all_authors(&pg_pool)))
 }
