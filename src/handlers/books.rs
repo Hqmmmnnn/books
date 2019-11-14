@@ -2,7 +2,7 @@ use crate::db_connection::PgPool;
 use crate::handlers::pg_pool_handler;
 use crate::handlers::LoggedUser;
 use crate::models::book::{Book, ListOfBooks, NewBook};
-use crate::models::user_book::{ListOfUserBook, NewUserBook};
+use crate::models::user_book::{ListOfUserBook, NewUserBook, UserBook};
 
 use actix_web::{web, HttpResponse, Result};
 
@@ -17,6 +17,17 @@ pub fn get_users_books(
 ) -> Result<HttpResponse, HttpResponse> {
   let pg_pool = pg_pool_handler(pool)?;
   Ok(HttpResponse::Ok().json(ListOfUserBook::get_all_books(_user.id, &pg_pool)))
+}
+
+pub fn delete_users_books(
+  _user: LoggedUser,
+  _book_id: web::Path<i32>,
+  pool: web::Data<PgPool>,
+) -> Result<HttpResponse, HttpResponse> {
+  let pg_pool = pg_pool_handler(pool)?;
+  UserBook::delete_book_by_id(&_book_id, _user.id, &pg_pool)
+    .map(|_| HttpResponse::Ok().json(()))
+    .map_err(|err| HttpResponse::InternalServerError().json(err.to_string()))
 }
 
 pub fn get_books_by_id(
@@ -74,7 +85,7 @@ pub fn delete_by_id(
 ) -> Result<HttpResponse, HttpResponse> {
   if _user.role == String::from("admin") {
     let pg_pool = pg_pool_handler(pool)?;
-    Book::delete_by_id(_user.id, &book_id, &pg_pool)
+    Book::delete_by_id(&book_id, &pg_pool)
       .map(|_| HttpResponse::Ok().json(()))
       .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
   } else {
@@ -90,7 +101,7 @@ pub fn update_by_id(
 ) -> Result<HttpResponse, HttpResponse> {
   if _user.role == String::from("admin") {
     let pg_pool = pg_pool_handler(pool)?;
-    Book::update_by_id(_user.id, &id, &pg_pool, &new_product)
+    Book::update_by_id(&id, &pg_pool, &new_product)
       .map(|_| HttpResponse::Ok().json(()))
       .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
   } else {

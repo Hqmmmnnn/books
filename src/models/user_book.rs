@@ -27,6 +27,20 @@ impl UserBook {
       .find(_book_id)
       .first(connection)
   }
+
+  pub fn delete_book_by_id(
+    _book_id: &i32,
+    param_user_id: i32,
+    connection: &PgConnection,
+  ) -> Result<(), diesel::result::Error> {
+    diesel::delete(
+      users_books::table
+        .filter(user_id.eq(param_user_id))
+        .filter(book_id.eq(_book_id)),
+    )
+    .execute(connection)?;
+    Ok(())
+  }
 }
 
 #[derive(Serialize, Deserialize)]

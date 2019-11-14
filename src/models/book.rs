@@ -46,32 +46,21 @@ impl Book {
   }
 
   pub fn delete_by_id(
-    param_user_id: i32,
     book_id: &i32,
     connection: &PgConnection,
   ) -> Result<(), diesel::result::Error> {
-    diesel::delete(
-      schema::books::table
-        .filter(user_id.eq(param_user_id))
-        .find(book_id),
-    )
-    .execute(connection)?;
+    diesel::delete(schema::books::table.find(book_id)).execute(connection)?;
     Ok(())
   }
 
   pub fn update_by_id(
-    param_user_id: i32,
     _id: &i32,
     connection: &PgConnection,
     new_book: &NewBook,
   ) -> Result<(), diesel::result::Error> {
-    diesel::update(
-      schema::books::table
-        .filter(user_id.eq(param_user_id))
-        .find(_id),
-    )
-    .set(new_book)
-    .execute(connection)?;
+    diesel::update(schema::books::table.find(_id))
+      .set(new_book)
+      .execute(connection)?;
     Ok(())
   }
 }
@@ -109,7 +98,6 @@ impl ListOfBooks {
   pub fn get_list(param_user_id: i32, connection: &PgConnection) -> Self {
     let result = books
       .filter(user_id.eq(param_user_id))
-      .limit(10)
       .load::<Book>(connection)
       .expect("Error loading products");
 

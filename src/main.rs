@@ -80,6 +80,10 @@ fn main() {
             .service(
                 web::resource("/userBooks").route(web::get().to(handlers::books::get_users_books)),
             )
+            .service(
+                web::resource("/userBooks/{id}")
+                    .route(web::delete().to(handlers::books::delete_users_books)),
+            )
             .service(web::resource("/takeBook").route(web::post().to(handlers::books::take_book)))
             .service(
                 web::resource("/books")
