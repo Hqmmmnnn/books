@@ -12,8 +12,6 @@ struct Claims {
   exp: usize,
 }
 
-// We're using a struct so we can implement a conversion from
-// Claims to SlimUser, useful in the decode function.
 #[derive(Serialize)]
 pub struct SlimUser {
   pub id: i32,

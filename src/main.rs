@@ -77,6 +77,11 @@ fn main() {
                     .route(web::post().to(handlers::authentication::login))
                     .route(web::delete().to(handlers::authentication::logout)),
             )
+            .service(web::resource("/users").route(web::get().to(handlers::users::get_all_users)))
+            .service(
+                web::resource("/users/{id}")
+                    .route(web::delete().to(handlers::users::delete_user_by_id)),
+            )
             .service(
                 web::resource("/userBooks").route(web::get().to(handlers::books::get_users_books)),
             )

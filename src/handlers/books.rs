@@ -6,14 +6,14 @@ use crate::models::user_book::{ListOfUserBook, NewUserBook, UserBook};
 
 use actix_web::{web, HttpResponse, Result};
 
-pub fn get_all(pool: web::Data<PgPool>) -> Result<HttpResponse, HttpResponse> {
+pub fn get_all(_user: LoggedUser, pool: web::Data<PgPool>) -> Result<HttpResponse, HttpResponse> {
   let pg_pool = pg_pool_handler(pool)?;
-  Ok(HttpResponse::Ok().json(ListOfBooks::get_list(1, &pg_pool)))
+  Ok(HttpResponse::Ok().json(ListOfBooks::get_list(&pg_pool)))
 }
 
 pub fn get_users_books(
-  pool: web::Data<PgPool>,
   _user: LoggedUser,
+  pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, HttpResponse> {
   let pg_pool = pg_pool_handler(pool)?;
   Ok(HttpResponse::Ok().json(ListOfUserBook::get_all_books(_user.id, &pg_pool)))
@@ -28,14 +28,6 @@ pub fn delete_users_books(
   UserBook::delete_book_by_id(&_book_id, _user.id, &pg_pool)
     .map(|_| HttpResponse::Ok().json(()))
     .map_err(|err| HttpResponse::InternalServerError().json(err.to_string()))
-}
-
-pub fn get_books_by_id(
-  _user: LoggedUser,
-  pool: web::Data<PgPool>,
-) -> Result<HttpResponse, HttpResponse> {
-  let pg_pool = pg_pool_handler(pool)?;
-  Ok(HttpResponse::Ok().json(ListOfBooks::get_list(_user.id, &pg_pool)))
 }
 
 pub fn take_book(
@@ -69,7 +61,6 @@ pub fn create(
 pub fn find_by_id(
   _user: LoggedUser,
   _book_id: web::Path<i32>,
-
   pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, HttpResponse> {
   let pg_pool = pg_pool_handler(pool)?;

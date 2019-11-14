@@ -4,6 +4,7 @@ pub mod books;
 pub mod default;
 pub mod get_current_account;
 pub mod register;
+pub mod users;
 
 use crate::db_connection::{PgPool, PgPooledConnection};
 use actix_web::web;

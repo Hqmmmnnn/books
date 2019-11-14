@@ -1,10 +1,12 @@
 use crate::schema::users;
 use chrono::NaiveDateTime;
+use diesel::ExpressionMethods;
+use diesel::QueryDsl;
+use diesel::RunQueryDsl;
 
 #[derive(Debug, Serialize, Deserialize, Queryable, Insertable)]
 #[table_name = "users"]
 pub struct User {
-  #[serde(skip)]
   pub id: i32,
   pub email: String,
   pub first_name: String,
@@ -13,6 +15,19 @@ pub struct User {
   #[serde(skip)]
   pub password: String,
   pub created_at: NaiveDateTime,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ListOfUsers(pub Vec<User>);
+
+impl ListOfUsers {
+  pub fn get_all(connection: &PgConnection) -> Self {
+    let users = users::table
+      .load::<User>(connection)
+      .expect("Error loading users");
+
+    ListOfUsers(users)
+  }
 }
 
 #[derive(Debug, Serialize, Deserialize, Insertable)]
@@ -36,8 +51,6 @@ impl User {
     register_user: RegisterUser,
     connection: &PgConnection,
   ) -> Result<User, MyStoreError> {
-    use diesel::RunQueryDsl;
-
     Ok(
       diesel::insert_into(users::table)
         .values(NewUser {
@@ -50,6 +63,14 @@ impl User {
         })
         .get_result(connection)?,
     )
+  }
+
+  pub fn delete_by_id(
+    _user_id: &i32,
+    connection: &PgConnection,
+  ) -> Result<(), diesel::result::Error> {
+    diesel::delete(users::table.find(_user_id)).execute(connection)?;
+    Ok(())
   }
 
   pub fn hash_password(plain: String) -> Result<String, MyStoreError> {
@@ -88,9 +109,6 @@ impl AuthUser {
   pub fn login(&self, connection: &PgConnection) -> Result<User, MyStoreError> {
     use crate::schema::users::dsl::email;
     use bcrypt::verify;
-    use diesel::ExpressionMethods;
-    use diesel::QueryDsl;
-    use diesel::RunQueryDsl;
 
     let mut records = users::table
       .filter(email.eq(&self.email))

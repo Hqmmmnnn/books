@@ -95,7 +95,15 @@ impl NewBook {
 pub struct ListOfBooks(pub Vec<Book>);
 
 impl ListOfBooks {
-  pub fn get_list(param_user_id: i32, connection: &PgConnection) -> Self {
+  pub fn get_list(connection: &PgConnection) -> Self {
+    let result = books
+      .load::<Book>(connection)
+      .expect("Error loading products");
+
+    ListOfBooks(result)
+  }
+
+  pub fn get_user_books(param_user_id: &i32, connection: &PgConnection) -> Self {
     let result = books
       .filter(user_id.eq(param_user_id))
       .load::<Book>(connection)
