@@ -5,7 +5,7 @@ use diesel::PgConnection;
 use diesel::QueryDsl;
 use diesel::RunQueryDsl;
 
-#[derive(Identifiable, Queryable, Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Identifiable, Queryable, Serialize, Deserialize, Clone, PartialEq)]
 #[table_name = "authors"]
 pub struct Author {
   pub id: i32,
@@ -36,10 +36,11 @@ impl Author {
 pub struct ListOfAuthors(pub Vec<Author>);
 
 impl ListOfAuthors {
-  pub fn get_all_authors(connection: &PgConnection) -> Self {
+  pub fn get_all(connection: &PgConnection) -> Self {
     let authors = authors::table
       .load::<Author>(connection)
       .expect("Error loading authors");
+
     ListOfAuthors(authors)
   }
 }

@@ -12,8 +12,16 @@ table! {
         id -> Int4,
         user_id -> Int4,
         author_id -> Int4,
+        genre_id -> Int4,
         name -> Varchar,
         price -> Nullable<Int4>,
+    }
+}
+
+table! {
+    genres (id) {
+        id -> Int4,
+        name -> Varchar,
     }
 }
 
@@ -39,6 +47,7 @@ table! {
 }
 
 joinable!(books -> authors (author_id));
+joinable!(books -> genres (genre_id));
 joinable!(books -> users (user_id));
 joinable!(users_books -> books (book_id));
 joinable!(users_books -> users (user_id));
@@ -46,6 +55,7 @@ joinable!(users_books -> users (user_id));
 allow_tables_to_appear_in_same_query!(
     authors,
     books,
+    genres,
     users,
     users_books,
 );

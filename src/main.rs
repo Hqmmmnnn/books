@@ -102,6 +102,11 @@ fn main() {
                     .route(web::patch().to(handlers::books::update_by_id)),
             )
             .service(
+                web::resource("/genres")
+                    .route(web::get().to(handlers::genres::get_all))
+                    .route(web::post().to(handlers::genres::create)),
+            )
+            .service(
                 web::resource("/authors")
                     .route(web::get().to(handlers::authors::get_all))
                     .route(web::post().to(handlers::authors::create)),

@@ -1,4 +1,3 @@
-use crate::models::author::Author;
 use crate::schema;
 use crate::schema::books;
 use diesel::PgConnection;
@@ -8,13 +7,13 @@ use diesel::ExpressionMethods;
 use diesel::QueryDsl;
 use diesel::RunQueryDsl;
 
-#[derive(Identifiable, Associations, Queryable, Serialize, Deserialize, Clone, PartialEq)]
-#[belongs_to(Author)]
+#[derive(Identifiable, Queryable, Serialize, Deserialize, Clone, PartialEq)]
 #[table_name = "books"]
 pub struct Book {
   pub id: i32,
   pub user_id: i32,
   pub author_id: i32,
+  pub genre_id: i32,
   pub name: String,
   pub price: Option<i32>,
 }
@@ -69,8 +68,9 @@ impl Book {
 #[table_name = "books"]
 pub struct NewBook {
   pub user_id: Option<i32>,
-  pub name: Option<String>,
   pub author_id: Option<i32>,
+  pub genre_id: Option<i32>,
+  pub name: Option<String>,
   pub price: Option<i32>,
 }
 

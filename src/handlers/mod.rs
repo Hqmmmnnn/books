@@ -3,6 +3,8 @@ pub mod authors;
 pub mod books;
 pub mod default;
 pub mod get_current_account;
+//pub mod raw_sql_requests;
+pub mod genres;
 pub mod register;
 pub mod users;
 
@@ -35,28 +37,22 @@ impl FromRequest for LoggedUser {
       HttpResponse::InternalServerError()
     })?;
 
-    let csrf_token = req.headers().get("x-csrf-token").ok_or({
-      println!("get x-src-token failure");
-      HttpResponse::Unauthorized()
-    })?;
+    let csrf_token = req
+      .headers()
+      .get("x-csrf-token")
+      .ok_or({ HttpResponse::Unauthorized() })?;
 
-    let decoded_token = hex::decode(&csrf_token).map_err(|error| {
-      println!("decoded_token failure");
-      HttpResponse::InternalServerError().json(error.to_string())
-    })?;
+    let decoded_token = hex::decode(&csrf_token)
+      .map_err(|error| HttpResponse::InternalServerError().json(error.to_string()))?;
 
-    generator.verify(&decoded_token).map_err(|_| {
-      println!("verify decoded_token failure");
-      HttpResponse::Unauthorized()
-    })?;
+    generator
+      .verify(&decoded_token)
+      .map_err(|_| HttpResponse::Unauthorized())?;
 
     if let Some(identity) = Identity::from_request(req, payload)?.identity() {
       let user: SlimUser = decode_token(&identity)?;
       return Ok(user as LoggedUser);
     }
-    Err({
-      println!("some(itentity) failure");
-      HttpResponse::Unauthorized().into()
-    })
+    Err({ HttpResponse::Unauthorized().into() })
   }
 }

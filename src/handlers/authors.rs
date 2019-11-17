@@ -47,5 +47,5 @@ pub fn delete_by_id(
 
 pub fn get_all(_user: LoggedUser, pool: web::Data<PgPool>) -> Result<HttpResponse, HttpResponse> {
   let pg_pool = pg_pool_handler(pool)?;
-  Ok(HttpResponse::Ok().json(ListOfAuthors::get_all_authors(&pg_pool)))
+  Ok(HttpResponse::Ok().json(ListOfAuthors::get_all(&pg_pool)))
 }
