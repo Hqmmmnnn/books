@@ -1,7 +1,7 @@
 use crate::db_connection::PgPool;
 use crate::handlers::pg_pool_handler;
 use crate::handlers::LoggedUser;
-use crate::models::genre::{ListOfGenres, NewGenre};
+use crate::models::genre::{Genre, ListOfGenres, NewGenre};
 
 use actix_web::{web, HttpResponse, Result};
 
@@ -19,7 +19,22 @@ pub fn create(
     let pg_pool = pg_pool_handler(pool)?;
     new_genre
       .create(&pg_pool)
-      .map(|author| HttpResponse::Ok().json(author))
+      .map(|genre| HttpResponse::Ok().json(genre))
+      .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
+  } else {
+    Err(HttpResponse::InternalServerError().json("access denied".to_string()))
+  }
+}
+
+pub fn delete_by_id(
+  _user: LoggedUser,
+  genre_id: web::Path<i32>,
+  pool: web::Data<PgPool>,
+) -> Result<HttpResponse, HttpResponse> {
+  if _user.role == String::from("admin") {
+    let pg_pool = pg_pool_handler(pool)?;
+    Genre::delete_by_id(&genre_id, &pg_pool)
+      .map(|_| HttpResponse::Ok().json(()))
       .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
   } else {
     Err(HttpResponse::InternalServerError().json("access denied".to_string()))

@@ -21,6 +21,14 @@ impl Genre {
 
     result
   }
+
+  pub fn delete_by_id(
+    genre_id: &i32,
+    connection: &PgConnection,
+  ) -> Result<(), diesel::result::Error> {
+    diesel::delete(schema::genres::table.find(genre_id)).execute(connection)?;
+    Ok(())
+  }
 }
 
 #[derive(Serialize, Deserialize)]

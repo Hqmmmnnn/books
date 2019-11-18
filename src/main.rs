@@ -107,6 +107,10 @@ fn main() {
                     .route(web::post().to(handlers::genres::create)),
             )
             .service(
+                web::resource("/genres/{id}")
+                    .route(web::delete().to(handlers::genres::delete_by_id)),
+            )
+            .service(
                 web::resource("/authors")
                     .route(web::get().to(handlers::authors::get_all))
                     .route(web::post().to(handlers::authors::create)),
