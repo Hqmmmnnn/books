@@ -40,3 +40,19 @@ pub fn delete_by_id(
     Err(HttpResponse::InternalServerError().json("access denied".to_string()))
   }
 }
+
+pub fn update_by_id(
+  _user: LoggedUser,
+  genre_id: web::Path<i32>,
+  pool: web::Data<PgPool>,
+  new_genre: web::Json<NewGenre>,
+) -> Result<HttpResponse, HttpResponse> {
+  if _user.role == String::from("admin") {
+    let pg_pool = pg_pool_handler(pool)?;
+    Genre::update_by_id(&genre_id, &pg_pool, &new_genre)
+      .map(|_| HttpResponse::Ok().json(()))
+      .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
+  } else {
+    Err(HttpResponse::InternalServerError().json("access denied".to_string()))
+  }
+}

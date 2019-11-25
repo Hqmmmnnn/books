@@ -45,6 +45,22 @@ pub fn delete_by_id(
   }
 }
 
+pub fn update_by_id(
+  _user: LoggedUser,
+  author_id: web::Path<i32>,
+  pool: web::Data<PgPool>,
+  new_author: web::Json<NewAuthor>,
+) -> Result<HttpResponse, HttpResponse> {
+  if _user.role == String::from("admin") {
+    let pg_pool = pg_pool_handler(pool)?;
+    Author::update_by_id(&author_id, &pg_pool, &new_author)
+      .map(|_| HttpResponse::Ok().json(()))
+      .map_err(|e| HttpResponse::InternalServerError().json(e.to_string()))
+  } else {
+    Err(HttpResponse::InternalServerError().json("access denied".to_string()))
+  }
+}
+
 pub fn get_all(_user: LoggedUser, pool: web::Data<PgPool>) -> Result<HttpResponse, HttpResponse> {
   let pg_pool = pg_pool_handler(pool)?;
   Ok(HttpResponse::Ok().json(ListOfAuthors::get_all(&pg_pool)))

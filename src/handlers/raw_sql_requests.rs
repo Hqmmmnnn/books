@@ -14,9 +14,9 @@ pub struct RawSql {
 
 impl RawSql {
   pub fn raw_sql(request: &String, connection: &PgConnection) -> Self {
-    let response = sql_query("SELECT * FROM ?")
+    let response = sql_query("?")
       .bind::<Text, _>(request)
-      .get_result::<RawSql>(connection)
+      .get_result(connection)
       .expect("error raw sql request");
 
     response
@@ -30,9 +30,4 @@ pub fn raw_sql_execute(
   let pg_pool = pg_pool_handler(pool)?;
   Ok(HttpResponse::Ok().json(RawSql::raw_sql(&_raw_sql.response, &pg_pool)))
 }
-
-      .service(
-                web::resource("/rawSql")
-                    .route(web::get().to(handlers::raw_sql_requests::raw_sql_execute)),
-            )
 */

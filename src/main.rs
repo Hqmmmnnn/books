@@ -108,7 +108,8 @@ fn main() {
             )
             .service(
                 web::resource("/genres/{id}")
-                    .route(web::delete().to(handlers::genres::delete_by_id)),
+                    .route(web::delete().to(handlers::genres::delete_by_id))
+                    .route(web::patch().to(handlers::genres::update_by_id)),
             )
             .service(
                 web::resource("/authors")
@@ -117,7 +118,8 @@ fn main() {
             )
             .service(
                 web::resource("/authors/{id}")
-                    .route(web::delete().to(handlers::authors::delete_by_id)),
+                    .route(web::delete().to(handlers::authors::delete_by_id))
+                    .route(web::patch().to(handlers::authors::update_by_id)),
             )
             .service(
                 web::resource("/getCurrentAccount")

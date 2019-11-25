@@ -30,6 +30,17 @@ impl Author {
     diesel::delete(authors::table.find(author_id)).execute(connection)?;
     Ok(())
   }
+
+  pub fn update_by_id(
+    author_id: &i32,
+    connection: &PgConnection,
+    new_author: &NewAuthor,
+  ) -> Result<(), diesel::result::Error> {
+    diesel::update(authors::table.find(author_id))
+      .set(new_author)
+      .execute(connection)?;
+    Ok(())
+  }
 }
 
 #[derive(Serialize, Deserialize)]
@@ -45,7 +56,7 @@ impl ListOfAuthors {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, Insertable, Clone)]
+#[derive(AsChangeset, Insertable, Deserialize, Clone)]
 #[table_name = "authors"]
 pub struct NewAuthor {
   pub fio: String,

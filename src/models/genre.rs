@@ -29,6 +29,17 @@ impl Genre {
     diesel::delete(schema::genres::table.find(genre_id)).execute(connection)?;
     Ok(())
   }
+
+  pub fn update_by_id(
+    genre_id: &i32,
+    connection: &PgConnection,
+    new_genre: &NewGenre,
+  ) -> Result<(), diesel::result::Error> {
+    diesel::update(schema::genres::table.find(genre_id))
+      .set(new_genre)
+      .execute(connection)?;
+    Ok(())
+  }
 }
 
 #[derive(Serialize, Deserialize)]
@@ -44,7 +55,7 @@ impl ListOfGenres {
   }
 }
 
-#[derive(Serialize, Deserialize, Insertable, Clone)]
+#[derive(AsChangeset, Deserialize, Insertable, Clone)]
 #[table_name = "genres"]
 pub struct NewGenre {
   pub name: String,

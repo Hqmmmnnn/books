@@ -2,9 +2,9 @@ pub mod authentication;
 pub mod authors;
 pub mod books;
 pub mod default;
+pub mod genres;
 pub mod get_current_account;
 //pub mod raw_sql_requests;
-pub mod genres;
 pub mod register;
 pub mod users;
 
