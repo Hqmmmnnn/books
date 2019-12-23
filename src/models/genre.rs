@@ -5,7 +5,7 @@ use diesel::PgConnection;
 use diesel::QueryDsl;
 use diesel::RunQueryDsl;
 
-#[derive(Identifiable, Queryable, Serialize, Deserialize, Clone)]
+#[derive(Identifiable, Queryable, Serialize, Deserialize, Clone, QueryableByName)]
 #[table_name = "genres"]
 pub struct Genre {
   pub id: i32,
@@ -55,7 +55,7 @@ impl ListOfGenres {
   }
 }
 
-#[derive(AsChangeset, Deserialize, Insertable, Clone)]
+#[derive(AsChangeset, Deserialize, Insertable, Clone, QueryableByName)]
 #[table_name = "genres"]
 pub struct NewGenre {
   pub name: String,

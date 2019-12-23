@@ -4,7 +4,7 @@ use diesel::ExpressionMethods;
 use diesel::QueryDsl;
 use diesel::RunQueryDsl;
 
-#[derive(Debug, Serialize, Deserialize, Queryable, Insertable)]
+#[derive(Debug, Serialize, Deserialize, Queryable, Insertable, QueryableByName)]
 #[table_name = "users"]
 pub struct User {
   pub id: i32,
@@ -30,7 +30,7 @@ impl ListOfUsers {
   }
 }
 
-#[derive(Debug, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Serialize, Deserialize, Insertable, QueryableByName)]
 #[table_name = "users"]
 pub struct NewUser {
   pub email: String,

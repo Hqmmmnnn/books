@@ -5,7 +5,7 @@ use diesel::PgConnection;
 use diesel::QueryDsl;
 use diesel::RunQueryDsl;
 
-#[derive(Identifiable, Queryable, Serialize, Deserialize, Clone, PartialEq)]
+#[derive(Identifiable, Queryable, Serialize, Deserialize, Clone, PartialEq, QueryableByName)]
 #[table_name = "authors"]
 pub struct Author {
   pub id: i32,
@@ -56,7 +56,7 @@ impl ListOfAuthors {
   }
 }
 
-#[derive(AsChangeset, Insertable, Deserialize, Clone)]
+#[derive(AsChangeset, Insertable, Deserialize, Clone, QueryableByName)]
 #[table_name = "authors"]
 pub struct NewAuthor {
   pub fio: String,

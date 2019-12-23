@@ -7,7 +7,7 @@ use diesel::ExpressionMethods;
 use diesel::QueryDsl;
 use diesel::RunQueryDsl;
 
-#[derive(Identifiable, Queryable, Serialize, Deserialize, Clone, PartialEq)]
+#[derive(Identifiable, Queryable, Serialize, Deserialize, Clone, PartialEq, QueryableByName)]
 #[table_name = "books"]
 pub struct Book {
   pub id: i32,
@@ -64,7 +64,7 @@ impl Book {
   }
 }
 
-#[derive(Insertable, Deserialize, AsChangeset, Clone)]
+#[derive(Insertable, Deserialize, AsChangeset, Clone, QueryableByName)]
 #[table_name = "books"]
 pub struct NewBook {
   pub user_id: Option<i32>,

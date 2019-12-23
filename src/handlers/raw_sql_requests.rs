@@ -9,7 +9,7 @@ use diesel::PgConnection;
 #[derive(Queryable, Serialize, Deserialize, Clone, PartialEq, QueryableByName)]
 pub struct RawSql {
   #[sql_type = "Text"]
-  pub response: String,
+  pub request: String,
 }
 
 impl RawSql {
@@ -17,7 +17,7 @@ impl RawSql {
     let response = sql_query("?")
       .bind::<Text, _>(request)
       .get_result(connection)
-      .expect("error raw sql request");
+      .expect("error raw sql request :(");
 
     response
   }
@@ -28,6 +28,6 @@ pub fn raw_sql_execute(
   pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, HttpResponse> {
   let pg_pool = pg_pool_handler(pool)?;
-  Ok(HttpResponse::Ok().json(RawSql::raw_sql(&_raw_sql.response, &pg_pool)))
+  Ok(HttpResponse::Ok().json(RawSql::raw_sql(&_raw_sql.request, &pg_pool)))
 }
 */
